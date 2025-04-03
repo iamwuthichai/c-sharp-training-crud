@@ -1,0 +1,44 @@
+# Build & Runtime
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.log
+
+# User-Specific Files
+*.user
+*.suo
+*.sln.docstates
+
+# Environment & Secrets
+.env
+*.config
+appsettings*.json
+!appsettings.json
+!appsettings.Development.json
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.sln.iml
+.vs/
+
+# NuGet Packages
+*.nupkg
+packages/
+.nuget/
+
+# Logs & Debugging
+logs/
+*.log
+debug.log
+*.trace
+
+# Temporary & Generated Files
+*.bak
+*.tmp
+*.swp
+*.swo
+Thumbs.db
+.DS_Store

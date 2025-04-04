@@ -39,6 +39,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IGenresRepository, GenreRepository>();
 builder.Services.AddScoped<IActorsRepository, ActorsRepository>();
+builder.Services.AddScoped<IMoviesRepository, MoviesRepository>();
 
 builder.Services.AddTransient<IFileStorage, LocalFileStorage>();
 builder.Services.AddHttpContextAccessor();
@@ -64,5 +65,6 @@ app.MapGet("/", () => applicationNameC);
 
 app.MapGroup("/genres").MapGenres();
 app.MapGroup("/actors").MapActors();
+app.MapGroup("/movies").MapMovies();
 
 app.Run();

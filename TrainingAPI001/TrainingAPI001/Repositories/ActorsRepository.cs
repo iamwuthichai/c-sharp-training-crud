@@ -1,18 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using TrainingAPI001.DTOs;
 using TrainingAPI001.Entities;
 
 namespace TrainingAPI001.Repositories
 {
-    public class ActorsRepository(ApplicationDbContext context) : IActorsRepository
+    public class ActorsRepository(ApplicationDbContext context,
+        IHttpContextAccessor httpContextAccessor) : IActorsRepository
     {
-        public async Task<List<Actor>> GetAll()
+        public async Task<List<Actor>> GetAll(PaginationDTO pagination)
         {
-            return await context.Actors.OrderBy(a => a.Name).ToListAsync();
+            var queryable = context.Actors.AsQueryable();
+            await httpContextAccessor
+                .HttpContext!.InsertPaginationParameterInResponseHeader(queryable);
+            return await queryable.OrderBy(a => a.Name).Pagination(pagination).ToListAsync();
         }
 
         public async Task<Actor?> GetById(int id)
         {
             return await context.Actors.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<List<Actor>> GetByName(string name)
+        {
+            return await context.Actors
+                .Where(a => a.Name == name)
+                .OrderBy(a => a.Name).ToListAsync();
         }
 
         public async Task<int> Create(Actor actor)

@@ -18,6 +18,9 @@ namespace TrainingAPI001.Utilities
             CreateMap<Movie, MovieDTO>();
             CreateMap<CreateMovieDTO, Movie>()
                 .ForMember(p => p.Poster, options => options.Ignore());
+
+            CreateMap<Comment, CommentDTO>();
+            CreateMap<CreateCommentDTO, Comment>();
         }
     }
 }

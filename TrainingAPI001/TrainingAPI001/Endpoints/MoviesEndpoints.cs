@@ -20,6 +20,8 @@ namespace TrainingAPI001.Endpoints
             group.MapPost("/", Create).DisableAntiforgery();
             group.MapPut("/{id:int}", Update).DisableAntiforgery();
             group.MapDelete("/{id:int}", Delete);
+            group.MapPost("/{id:int}/assignGenres", AssignGenres);
+            group.MapPost("/{id:int}/assignActors", AssignActors);
             return group;
         }
 
@@ -105,6 +107,62 @@ namespace TrainingAPI001.Endpoints
             await repository.Delete(id);
             await fileStorage.Delete(movieDB.Poster, container);
             await outputCacheStore.EvictByTagAsync("movies-get", default);
+            return TypedResults.NoContent();
+        }
+
+        static async Task<Results<NoContent, NotFound, BadRequest<string>>> AssignGenres 
+            (int id, List<int> gerensids, IMoviesRepository moviesRepository,
+            IGenresRepository genresRepository)
+        {
+            if (! await moviesRepository.Exists(id))
+            {
+                return TypedResults.NotFound();
+            }
+
+            var existingGerens = new List<int>();
+
+            if (gerensids.Count != 0)
+            {
+                existingGerens = await genresRepository.Exists(gerensids);
+            }
+
+            if (gerensids.Count != existingGerens.Count)
+            {
+                var noExistingGenres = gerensids.Except(existingGerens);
+                var noExistingGenresCSV = string.Join(",", noExistingGenres);
+                return TypedResults.BadRequest($"The genres of id {noExistingGenresCSV} does not exsit.");
+            }
+
+            await moviesRepository.Assign(id, gerensids);
+            return TypedResults.NoContent();
+        }
+
+        static async Task<Results<NotFound, NoContent, BadRequest<string>>> AssignActors
+            (int id, List<AssignActorMovieDTO> actorsDTO, IMoviesRepository moviesRepository,
+            IActorsRepository actorsRepository, IMapper mapper)
+        {
+            if (!await moviesRepository.Exists(id))
+            {
+                return TypedResults.NotFound();
+            }
+
+            var existingActors = new List<int>();
+            var actorsIds = actorsDTO.Select(a => a.ActorId).ToList();
+
+            if (actorsDTO.Count != 0)
+            {
+                existingActors = await actorsRepository.Exist(actorsIds);
+            }
+
+            if (existingActors.Count != actorsDTO.Count)
+            {
+                var nonExistingActors = actorsIds.Except(existingActors);
+                var nonExistingActorsCSV = string.Join(",", nonExistingActors);
+                return TypedResults.BadRequest($"The actors of id {nonExistingActorsCSV} do not exists.");
+            }
+
+            var actors = mapper.Map<List<ActorMovie>>(actorsDTO);
+            await moviesRepository.Assign(id, actors);
             return TypedResults.NoContent();
         }
     }

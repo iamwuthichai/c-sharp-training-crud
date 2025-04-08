@@ -41,6 +41,12 @@ namespace TrainingAPI001.Repositories
             return await context.Actors.AnyAsync(a => a.Id == id);
         }
 
+        public async Task<List<int>> Exist(List<int> ids)
+        {
+            return await context.Actors.Where(a => ids.Contains(a.Id)).Select(a => a.Id)
+                .ToListAsync();
+        }
+
         public async Task Update(Actor actor)
         {
             context.Update(actor);

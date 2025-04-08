@@ -12,5 +12,6 @@ namespace TrainingAPI001.Repositories
         Task<bool> Exist(int id);
         Task Delete(int id);
         Task Update(Actor actor);
+        Task<List<int>> Exist(List<int> ids);
     }
 }

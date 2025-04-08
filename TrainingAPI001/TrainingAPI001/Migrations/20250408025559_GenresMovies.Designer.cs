@@ -12,8 +12,8 @@ using TrainingAPI001;
 namespace TrainingAPI001.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250404034857_Movies")]
-    partial class Movies
+    [Migration("20250408025559_GenresMovies")]
+    partial class GenresMovies
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,28 @@ namespace TrainingAPI001.Migrations
                     b.ToTable("Actors");
                 });
 
+            modelBuilder.Entity("TrainingAPI001.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("TrainingAPI001.Entities.Genre", b =>
                 {
                     b.Property<int>("Id")
@@ -66,6 +88,21 @@ namespace TrainingAPI001.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Genres");
+                });
+
+            modelBuilder.Entity("TrainingAPI001.Entities.GenreMovie", b =>
+                {
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GenreId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MovieId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("GenresMovies");
                 });
 
             modelBuilder.Entity("TrainingAPI001.Entities.Movie", b =>
@@ -94,6 +131,46 @@ namespace TrainingAPI001.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Movies");
+                });
+
+            modelBuilder.Entity("TrainingAPI001.Entities.Comment", b =>
+                {
+                    b.HasOne("TrainingAPI001.Entities.Movie", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TrainingAPI001.Entities.GenreMovie", b =>
+                {
+                    b.HasOne("TrainingAPI001.Entities.Genre", "Genre")
+                        .WithMany("GenresMovies")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TrainingAPI001.Entities.Movie", "Movie")
+                        .WithMany("GenresMovies")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genre");
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("TrainingAPI001.Entities.Genre", b =>
+                {
+                    b.Navigation("GenresMovies");
+                });
+
+            modelBuilder.Entity("TrainingAPI001.Entities.Movie", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("GenresMovies");
                 });
 #pragma warning restore 612, 618
         }

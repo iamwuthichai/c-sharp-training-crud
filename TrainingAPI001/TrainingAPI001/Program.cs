@@ -7,6 +7,8 @@ using TrainingAPI001.Endpoints;
 using TrainingAPI001.Entities;
 using TrainingAPI001.Repositories;
 using TrainingAPI001.Services;
+using Quartz;
+using TrainingAPI001.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,22 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionJobFactory();
+
+    var jobKey = new JobKey("InsertMovieJob");
+
+    q.AddJob<InsertMovieJob>(opts => opts.WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("InsertMovieJob-trigger")
+        .WithCronSchedule("0 * * * * ?")); // ทุก 1 นาที (ตอนวินาทีที่ 0)
+});
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+// App builder
 var app = builder.Build();
 
 // Middleware

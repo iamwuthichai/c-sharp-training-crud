@@ -47,6 +47,28 @@ namespace TrainingAPI001.Migrations
                     b.ToTable("Actors");
                 });
 
+            modelBuilder.Entity("TrainingAPI001.Entities.ActorMovie", b =>
+                {
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Character")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.HasKey("MovieId", "ActorId");
+
+                    b.HasIndex("ActorId");
+
+                    b.ToTable("ActorMovies");
+                });
+
             modelBuilder.Entity("TrainingAPI001.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -87,6 +109,21 @@ namespace TrainingAPI001.Migrations
                     b.ToTable("Genres");
                 });
 
+            modelBuilder.Entity("TrainingAPI001.Entities.GenreMovie", b =>
+                {
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GenreId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MovieId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("GenresMovies");
+                });
+
             modelBuilder.Entity("TrainingAPI001.Entities.Movie", b =>
                 {
                     b.Property<int>("Id")
@@ -115,6 +152,25 @@ namespace TrainingAPI001.Migrations
                     b.ToTable("Movies");
                 });
 
+            modelBuilder.Entity("TrainingAPI001.Entities.ActorMovie", b =>
+                {
+                    b.HasOne("TrainingAPI001.Entities.Actor", "Actor")
+                        .WithMany("ActorMovies")
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TrainingAPI001.Entities.Movie", "Movie")
+                        .WithMany("ActorMovies")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("Movie");
+                });
+
             modelBuilder.Entity("TrainingAPI001.Entities.Comment", b =>
                 {
                     b.HasOne("TrainingAPI001.Entities.Movie", null)
@@ -124,9 +180,42 @@ namespace TrainingAPI001.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TrainingAPI001.Entities.GenreMovie", b =>
+                {
+                    b.HasOne("TrainingAPI001.Entities.Genre", "Genre")
+                        .WithMany("GenresMovies")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TrainingAPI001.Entities.Movie", "Movie")
+                        .WithMany("GenresMovies")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genre");
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("TrainingAPI001.Entities.Actor", b =>
+                {
+                    b.Navigation("ActorMovies");
+                });
+
+            modelBuilder.Entity("TrainingAPI001.Entities.Genre", b =>
+                {
+                    b.Navigation("GenresMovies");
+                });
+
             modelBuilder.Entity("TrainingAPI001.Entities.Movie", b =>
                 {
+                    b.Navigation("ActorMovies");
+
                     b.Navigation("Comments");
+
+                    b.Navigation("GenresMovies");
                 });
 #pragma warning restore 612, 618
         }

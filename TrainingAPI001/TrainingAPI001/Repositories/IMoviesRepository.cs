@@ -11,5 +11,7 @@ namespace TrainingAPI001.Repositories
         Task Delete(int id);
         Task<bool> Exists(int id);
         Task Update(Movie movie);
+        Task Assign(int id, List<int> genresIds);
+        Task Assign(int id, List<ActorMovie> actors);
     }
 }

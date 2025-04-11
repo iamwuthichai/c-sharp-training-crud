@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.OutputCaching;
 using TrainingAPI001.DTOs;
 using TrainingAPI001.Entities;
@@ -25,27 +27,69 @@ namespace TrainingAPI001.Endpoints
             return group;
         }
 
-        static async Task<Ok<List<MovieDTO>>> GetAll(IMoviesRepository repository,
+        //static async Task<Ok<List<MovieDTO>>> GetAll(IMoviesRepository repository,
+        //    IMapper mapper, int page = 1, int recordsPerPage = 10)
+        //{
+        //    var pagination = new PaginationDTO { Page = page, RecordsPerPage = recordsPerPage };
+        //    var movies = await repository.GetAll(pagination);
+        //    var moviesDTO = mapper.Map<List<MovieDTO>>(movies);
+        //    //return TypedResults.Ok(moviesDTO);
+        //    return TypedResults.Json(moviesDTO);
+        //}
+        static async Task<IResult> GetAll(IMoviesRepository repository,
             IMapper mapper, int page = 1, int recordsPerPage = 10)
         {
             var pagination = new PaginationDTO { Page = page, RecordsPerPage = recordsPerPage };
+            // ดึงรายการหนังทั้งหมดในหน้านี้
             var movies = await repository.GetAll(pagination);
+            // ดึงจำนวนรวมของหนังทั้งหมดในระบบ (สำหรับใช้แสดง total)
+            var totalCount = await repository.CountAsync();
+            // แปลงเป็น DTO
             var moviesDTO = mapper.Map<List<MovieDTO>>(movies);
-            return TypedResults.Ok(moviesDTO);
+            // สร้าง response object ที่มี total + data
+            var response = new
+            {
+                total = totalCount,
+                page,
+                recordsPerPage,
+                totalPages = (int)Math.Ceiling((double)totalCount / recordsPerPage),
+                data = moviesDTO
+            };
+
+            return Results.Json(response);
         }
 
-        static async Task<Results<Ok<MovieDTO>, NotFound>> GetById(int id,
+        //static async Task<Results<Ok<MovieDTO>, NotFound>> GetById(int id,
+        //    IMoviesRepository repository, IMapper mapper)
+        //{
+        //    var movie = await repository.GetById(id);
+
+        //    if (movie is null)
+        //    {
+        //        return TypedResults.NotFound();
+        //    }
+
+        //    var movieDTO = mapper.Map<MovieDTO>(movie);
+        //    return TypedResults.Ok(movieDTO);
+        //}
+        static async Task<IResult> GetById(int id,
             IMoviesRepository repository, IMapper mapper)
         {
             var movie = await repository.GetById(id);
 
             if (movie is null)
             {
-                return TypedResults.NotFound();
+                //return TypedResults.NotFound();
+                var response = new
+                {
+
+                };
+                return Results.Json(response);
             }
 
             var movieDTO = mapper.Map<MovieDTO>(movie);
-            return TypedResults.Ok(movieDTO);
+            //return TypedResults.Ok(movieDTO);
+            return Results.Json(movieDTO);
         }
 
         static async Task<Created<MovieDTO>> Create([FromForm] CreateMovieDTO createMovieDTO,

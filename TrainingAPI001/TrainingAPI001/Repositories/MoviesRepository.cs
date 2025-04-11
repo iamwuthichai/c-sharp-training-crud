@@ -14,7 +14,8 @@ namespace TrainingAPI001.Repositories
             var queryable = context.Movies.AsQueryable();
             await httpContextAccessor.HttpContext!
                 .InsertPaginationParameterInResponseHeader(queryable);
-            return await queryable.OrderBy(m => m.Title)
+            return await queryable
+                .OrderBy(m => m.Id)
                 .Include(m => m.Comments)
                 .Pagination(pagination)
                 .ToListAsync();
@@ -87,6 +88,11 @@ namespace TrainingAPI001.Repositories
             movie.ActorMovies = mapper.Map(actors, movie.ActorMovies);
 
             await context.SaveChangesAsync();
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await context.Movies.CountAsync();
         }
     }
 }

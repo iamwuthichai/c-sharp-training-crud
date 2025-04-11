@@ -13,5 +13,6 @@ namespace TrainingAPI001.Repositories
         Task Update(Movie movie);
         Task Assign(int id, List<int> genresIds);
         Task Assign(int id, List<ActorMovie> actors);
+        Task<int> CountAsync();
     }
 }

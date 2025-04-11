@@ -49,20 +49,20 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
+//builder.Services.AddQuartz(q =>
+//{
+//    q.UseMicrosoftDependencyInjectionJobFactory();
 
-    var jobKey = new JobKey("InsertMovieJob");
+//    var jobKey = new JobKey("InsertMovieJob");
 
-    q.AddJob<InsertMovieJob>(opts => opts.WithIdentity(jobKey));
+//    q.AddJob<InsertMovieJob>(opts => opts.WithIdentity(jobKey));
 
-    q.AddTrigger(opts => opts
-        .ForJob(jobKey)
-        .WithIdentity("InsertMovieJob-trigger")
-        .WithCronSchedule("0 * * * * ?")); // ทุก 1 นาที (ตอนวินาทีที่ 0)
-});
-builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+//    q.AddTrigger(opts => opts
+//        .ForJob(jobKey)
+//        .WithIdentity("InsertMovieJob-trigger")
+//        .WithCronSchedule("0 * * * * ?")); // ทุก 1 นาที (ตอนวินาทีที่ 0)
+//});
+//builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 // App builder
 var app = builder.Build();
